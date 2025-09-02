@@ -1,14 +1,13 @@
 {
   "name": "enterprisse-search-frontend",
-  "version": "0.1.1",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "dev:turbo": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "export": "next build && next export"
+    "lint": "next lint"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.840.0",
@@ -54,9 +53,10 @@
     "dayjs": "^1.11.13",
     "diff-match-patch": "^1.0.5",
     "express": "^5.1.0",
-    "@react-pdf/renderer": "^3.4.4",
+    "@react-pdf/renderer": "^4.2.2",
     "md-to-pdf": "^5.2.4",
-    "puppeteer": "^21.11.0",
+    "md2pdf": "^3.2.0",
+    "node-latex": "^3.0.0",
     "framer-motion": "^12.18.1",
     "immer": "^10.1.1",
     "install": "^0.13.0",

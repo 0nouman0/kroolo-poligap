@@ -7,11 +7,11 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat
 
 # Install dependencies
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package*.json ./
+RUN npm ci --only=production=false
 
-# ⬇️ Copy the .env file explicitly before build
-COPY .env .env
+# Copy environment file if it exists (optional for build)
+COPY .env* ./
 
 # Copy all remaining app code
 COPY . .
@@ -32,9 +32,11 @@ RUN addgroup -g 1001 -S nodegroup && adduser -S nodeuser -u 1001 -G nodegroup
 # Copy only production assets
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/.env ./.env
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
+
+# Copy environment files from builder stage if they exist
+RUN if ls /app/.env* 1> /dev/null 2>&1; then cp /app/.env* ./; fi
 
 # ⬇️ Fix permission issue by pre-creating the image cache directory
 RUN mkdir -p .next/cache/images && chown -R nodeuser:nodegroup .next
