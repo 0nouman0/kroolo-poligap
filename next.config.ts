@@ -1,6 +1,10 @@
 import { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: 'export',
+  trailingSlash: true,
+  basePath: process.env.NODE_ENV === 'production' ? '/kroolo-poligap' : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/kroolo-poligap/' : '',
   compiler: {
     // Remove console logs in production and staging
     removeConsole: ["production", "staging"].includes(
