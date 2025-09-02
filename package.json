@@ -55,7 +55,7 @@
     "express": "^5.1.0",
     "@react-pdf/renderer": "^4.2.2",
     "md-to-pdf": "^5.2.4",
-    "md2pdf": "^3.2.0",
+    "md2pdf": "0.0.9",
     "node-latex": "^3.0.0",
     "framer-motion": "^12.18.1",
     "immer": "^10.1.1",
