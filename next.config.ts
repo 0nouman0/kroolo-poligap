@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
       process.env.NODE_ENV || ""
     ),
   },
+  eslint: {
+    // Temporarily ignore ESLint errors during builds to avoid FlatCompat runtime errors in CI
+    ignoreDuringBuilds: true,
+  },
   images: {
     domains: [
       "www.shutterstock.com",
