@@ -177,14 +177,34 @@ ${bodyLatex}
     } catch (errMdTo) {
       console.error("[export-pdf] md-to-pdf failed:", errMdTo);
       try {
-        const mod: any = (await import("md2pdf")).default ?? (await import("md2pdf"));
-        let buffer: Buffer | undefined;
-        try {
-          buffer = await mod(combined, { asBuffer: true });
-        } catch (inner) {
-          buffer = await mod({ content: combined }, { asBuffer: true });
-        }
-        if (!buffer) throw new Error("No PDF content from md2pdf");
+        // Use puppeteer for PDF generation as fallback
+        const puppeteer = await import("puppeteer");
+        const browser = await puppeteer.default.launch({ headless: true });
+        const page = await browser.newPage();
+        
+        // Convert markdown to HTML for puppeteer
+        const htmlContent = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <style>
+              body { font-family: 'Inter', system-ui, sans-serif; margin: 40px; }
+              h1 { font-size: 24px; font-weight: 700; margin: 16px 0 8px; }
+              h2 { font-size: 20px; font-weight: 700; margin: 16px 0 8px; }
+              h3 { font-size: 16px; font-weight: 700; margin: 16px 0 8px; }
+              p { margin: 8px 0; }
+              ul, ol { padding-left: 20px; margin: 8px 0; }
+            </style>
+          </head>
+          <body>${combined.replace(/\n/g, '<br>')}</body>
+          </html>
+        `;
+        
+        await page.setContent(htmlContent);
+        const buffer = await page.pdf({ format: 'A4' });
+        await browser.close();
+        
         return new NextResponse(buffer, {
           status: 200,
           headers: {
@@ -192,8 +212,8 @@ ${bodyLatex}
             "Content-Disposition": `attachment; filename=${fileName}.pdf`,
           },
         });
-      } catch (errMd2) {
-        console.error("[export-pdf] md2pdf failed:", errMd2);
+      } catch (errPuppeteer) {
+        console.error("[export-pdf] puppeteer failed:", errPuppeteer);
         // Try global CLI 'md-to-pdf' as a final markdown-aware fallback before react-pdf
         try {
           const os = await import('node:os');
@@ -260,9 +280,9 @@ ${bodyLatex}
           });
         } catch (fallbackErr) {
           const msg1 = (errMdTo as Error)?.message || String(errMdTo);
-          const msg2 = (errMd2 as Error)?.message || String(errMd2);
+          const msg2 = (errPuppeteer as Error)?.message || String(errPuppeteer);
           const msg3 = (fallbackErr as Error)?.message || String(fallbackErr);
-          return NextResponse.json({ error: "PDF export failed", mdToPdfError: msg1, md2pdfError: msg2, fallbackError: msg3 }, { status: 500 });
+          return NextResponse.json({ error: "PDF export failed", mdToPdfError: msg1, puppeteerError: msg2, fallbackError: msg3 }, { status: 500 });
         }
         }
       }
