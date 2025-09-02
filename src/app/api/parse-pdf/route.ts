@@ -221,13 +221,8 @@ async function parseWithPdfJs(buffer: Buffer): Promise<string> {
       };
     }
 
-    // Import PDF.js Node-compatible build with fallback and normalized export
-    let pdfjsLibAny: any;
-    try {
-      pdfjsLibAny = await import('pdfjs-dist/legacy/build/pdf.js');
-    } catch {
-      pdfjsLibAny = await import('pdfjs-dist');
-    }
+    // Import PDF.js Node-compatible build with normalized export
+    const pdfjsLibAny: any = await import('pdfjs-dist');
     const pdfjs: any = (pdfjsLibAny as any).default || pdfjsLibAny;
     
     // Do not set workerSrc in Node; rely on disableWorker: true below
