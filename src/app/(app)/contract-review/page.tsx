@@ -13,12 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-<<<<<<< Updated upstream
 import { Switch } from "@/components/ui/switch";
-=======
 import { extractTextFromPdf } from "@/lib/pdf";
 import { diff_match_patch, DIFF_DELETE, DIFF_INSERT, DIFF_EQUAL } from "diff-match-patch";
->>>>>>> Stashed changes
 
 interface ContractTemplate {
   id: string;
@@ -349,12 +346,9 @@ export default function ContractReview() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const extractedTextRef = useRef<HTMLDivElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-<<<<<<< Updated upstream
   const [applyRuleBase, setApplyRuleBase] = useState(false);
-=======
   const [appliedFixes, setAppliedFixes] = useState<string[]>([]);
   const [currentGapIndex, setCurrentGapIndex] = useState(0);
->>>>>>> Stashed changes
   
   // Audit logs state for selected template
   const [templateLogs, setTemplateLogs] = useState<any[]>([]);
