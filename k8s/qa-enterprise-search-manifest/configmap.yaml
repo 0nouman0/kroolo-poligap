@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kroolo-es-config-qastage01
+  namespace: fe-es-service-qastage01
+data:
+  NODE_ENV: staging
+  PORT: "3310"
+  API_KEY: "fghj"
+  API_URL: google.com

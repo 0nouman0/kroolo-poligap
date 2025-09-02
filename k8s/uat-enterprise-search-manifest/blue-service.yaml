@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: fe-es-search-ustage01
+  name: fe-es-service-ustage01
+  labels:
+    app: kroolo-es-ustage01
+spec:
+  type: NodePort
+  selector:
+    app: kroolo-es-ustage01
+    version: blue
+  ports:
+  - port: 80
+    targetPort: 3000

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blue-fe-es-search-ustage01
+  namespace: fe-es-search-ustage01
+  labels:
+    app: kroolo-es-ustage01
+    version: blue
+spec:
+  selector:
+    matchLabels:
+      app: kroolo-es-ustage01
+      version: blue
+  replicas: 2
+  strategy:
+    # Adding the rolling update strategy
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: kroolo-es-ustage01
+        version: blue
+    spec:
+      containers:
+      - name: blue-container
+        image: 315855795699.dkr.ecr.us-east-2.amazonaws.com/ustage01-es-search:latest
+        imagePullPolicy: Always
+        # envFrom:
+        #     - configMapRef:
+        #         name: kroolo-corp-config
+        ports:
+        - containerPort: 3000
+        # resources:
+        #   limits:
+        #     memory: "100Mi"
+        #     cpu: "200m"

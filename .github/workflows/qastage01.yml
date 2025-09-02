@@ -1,0 +1,140 @@
+name: Deploy to ECR and Kubernetes
+
+on:
+  pull_request:
+    branches: [ qastage01 ]
+    types: [ closed ]
+    conditions:
+    - merged == true
+  # pull_request:
+  #   branches: [ KR-1-staging ]
+  # push:
+  #   branches: [ qastage01 ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: qastage01
+    env:
+      NEXT_PUBLIC_BACKEND_URL: ${{ vars.NEXT_PUBLIC_BACKEND_URL }}
+      NEXT_PUBLIC_PARAGON_PROJECT_ID: ${{ vars.NEXT_PUBLIC_PARAGON_PROJECT_ID }}
+      BACKEND_URL: ${{ vars.BACKEND_URL }}
+      MONGODB_URI: ${{ vars.MONGODB_URI }}
+      REDIS_HOST: ${{ vars.REDIS_HOST }}
+      REDIS_PORT: ${{ vars.REDIS_PORT }}
+      MONGODB_ENTERPRISE_SEARCH_URI: ${{ vars.MONGODB_ENTERPRISE_SEARCH_URI }}
+      PARAGON_PRIVATE_KEY: ${{ vars.PARAGON_PRIVATE_KEY }}
+      NEXT_PUBLIC_API_KEY: ${{ vars.NEXT_PUBLIC_API_KEY }}
+      NEXT_PUBLIC_DJANGO_API_BASE_URL: ${{ vars.NEXT_PUBLIC_DJANGO_API_BASE_URL }}
+      PIPEDREAM_PROJECT_ID: ${{ vars.PIPEDREAM_PROJECT_ID }}
+      PIPEDREAM_CLIENT_ID: ${{ vars.PIPEDREAM_CLIENT_ID }}
+      PIPEDREAM_CLIENT_SECRET: ${{ vars.PIPEDREAM_CLIENT_SECRET }}
+      PIPEDREAM_ENVIRONMENT: ${{ vars.PIPEDREAM_ENVIRONMENT }}
+      NEXT_PUBLIC_SHARE_POINT_APP_ID: ${{ vars.NEXT_PUBLIC_SHARE_POINT_APP_ID }}
+      PIPEDREAM_BASE_URL: ${{ vars.PIPEDREAM_BASE_URL }}
+      NEXT_PUBLIC_REACT_APP_API_URL: ${{ vars.NEXT_PUBLIC_REACT_APP_API_URL }}
+      NEXT_PUBLIC_REACT_APP_API_URL_KROOLO_AI: ${{ vars.NEXT_PUBLIC_REACT_APP_API_URL_KROOLO_AI }}
+      NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_BUCKET_NAME: ${{ vars.AWS_BUCKET_NAME }}
+      PORTKEY_API_KEY: ${{ vars.PORTKEY_API_KEY }}
+      NEXT_PUBLIC_REACT_APP_AUTH_URL: ${{ vars.NEXT_PUBLIC_REACT_APP_AUTH_URL }}
+      NEXT_PUBLIC_AWS_COGNITO_DOMAIN: ${{ vars.NEXT_PUBLIC_AWS_COGNITO_DOMAIN }}
+      NEXT_PUBLIC_AWS_COGNITO_USER_POOL_WEB_CLIENT_ID: ${{ vars.NEXT_PUBLIC_AWS_COGNITO_USER_POOL_WEB_CLIENT_ID }}
+      NEXT_PUBLIC_REACT_APP_CORP_URL: ${{ vars.NEXT_PUBLIC_REACT_APP_CORP_URL }}
+      NEXT_PUBLIC_REACT_APP_PROPEL_AUTH_CLIENT_ID: ${{ vars.NEXT_PUBLIC_REACT_APP_PROPEL_AUTH_CLIENT_ID }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Print Environment Variables
+      run: |
+        echo "Creating .env file..."
+        echo "NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL" >> .env
+        echo "NEXT_PUBLIC_PARAGON_PROJECT_ID=$NEXT_PUBLIC_PARAGON_PROJECT_ID" >> .env
+        echo "MONGO_USERNAME=$MONGO_USERNAME" >> .env
+        echo "REDIS_HOST=$REDIS_HOST" >> .env
+        echo "REDIS_PORT=$REDIS_PORT" >> .env
+        echo "MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }}" >> .env
+        echo "MONGODB_URI=$MONGODB_URI" >> .env
+        echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
+        echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env  
+        echo "MONGODB_ENTERPRISE_SEARCH_URI=$MONGODB_ENTERPRISE_SEARCH_URI" >> .env
+        echo "PARAGON_PRIVATE_KEY=$PARAGON_PRIVATE_KEY" >> .env
+        echo "NEXT_PUBLIC_API_KEY=$NEXT_PUBLIC_API_KEY" >> .env
+        echo "BACKEND_URL=$BACKEND_URL" >> .env
+        echo "NEXT_PUBLIC_DJANGO_API_BASE_URL=$NEXT_PUBLIC_DJANGO_API_BASE_URL" >> .env
+        echo "NEXT_PUBLIC_SHARE_POINT_APP_ID=$NEXT_PUBLIC_SHARE_POINT_APP_ID" >> .env
+        echo "PIPEDREAM_PROJECT_ID=$PIPEDREAM_PROJECT_ID" >> .env
+        echo "PIPEDREAM_CLIENT_ID=$PIPEDREAM_CLIENT_ID" >> .env
+        echo "PIPEDREAM_CLIENT_SECRET=$PIPEDREAM_CLIENT_SECRET" >> .env
+        echo "PIPEDREAM_ENVIRONMENT=$PIPEDREAM_ENVIRONMENT" >> .env
+        echo "PIPEDREAM_BASE_URL=$PIPEDREAM_BASE_URL" >> .env
+        echo "NEXT_PUBLIC_REACT_APP_API_URL=$NEXT_PUBLIC_REACT_APP_API_URL" >> .env
+        echo "NEXT_PUBLIC_REACT_APP_API_URL_KROOLO_AI=$NEXT_PUBLIC_REACT_APP_API_URL_KROOLO_AI" >> .env
+        echo "AWS_REGION=$AWS_REGION" >> .env
+        echo "AWS_BUCKET_NAME=$AWS_BUCKET_NAME" >> .env
+        echo "NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL" >> .env
+        echo "PORTKEY_API_KEY=$PORTKEY_API_KEY" >> .env
+        echo "NEXT_PUBLIC_REACT_APP_AUTH_URL=$NEXT_PUBLIC_REACT_APP_AUTH_URL" >> .env
+        echo "NEXT_PUBLIC_AWS_COGNITO_DOMAIN=$NEXT_PUBLIC_AWS_COGNITO_DOMAIN" >> .env
+        echo "NEXT_PUBLIC_AWS_COGNITO_USER_POOL_WEB_CLIENT_ID=$NEXT_PUBLIC_AWS_COGNITO_USER_POOL_WEB_CLIENT_ID" >> .env
+        echo "NEXT_PUBLIC_REACT_APP_CORP_URL=$NEXT_PUBLIC_REACT_APP_CORP_URL" >> .env
+        echo "NEXT_PUBLIC_REACT_APP_PROPEL_AUTH_CLIENT_ID=$NEXT_PUBLIC_REACT_APP_PROPEL_AUTH_CLIENT_ID" >> .env
+
+    - name: Debug NEXT_PUBLIC_APP_URL
+      run: echo "NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL"
+
+    - name: Login to Amazon ECR
+      run: |
+        aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 315855795699.dkr.ecr.us-east-2.amazonaws.com
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_GITHUB_QA }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_GITHUB_QA }}
+        AWS_DEFAULT_REGION: us-east-2
+
+    - name: Set Version
+      id: set-version
+      run: echo "::set-output name=DOCKER_IMAGE_VERSION::${{ github.event.pull_request.title }}"
+
+    - name: Build and Push Docker Image
+      env:
+        DOCKER_IMAGE_VERSION: ${{ steps.set-version.outputs.DOCKER_IMAGE_VERSION }}
+      run: |
+        echo "Building Docker image with version ${{ github.event.pull_request.title }}"
+        docker build --no-cache -t qastage01-es-search:${{ github.event.pull_request.title }} .
+        docker images
+        docker tag qastage01-es-search:${{ github.event.pull_request.title }} 315855795699.dkr.ecr.us-east-2.amazonaws.com/qastage01-es-search:${{ github.event.pull_request.title }}
+        docker push 315855795699.dkr.ecr.us-east-2.amazonaws.com/qastage01-es-search:${{ github.event.pull_request.title }}
+
+    - name: Configure AWS CLI
+      run: |
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID_GITHUB_QA }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY_GITHUB_QA }}
+        aws configure set default.region us-east-2
+        aws configure set default.output json
+
+    - name: Configure kubectl
+      run: aws eks update-kubeconfig --name qastage01 --region us-east-2
+
+    - name: get pods
+      run: kubectl get po -n fe-es-search-qastage01
+
+    - name: deployment file
+      run: cat k8s/qa-enterprise-search-manifest/blue-deployment.yaml
+
+    - name: Update YAML files with sed
+      run: |
+        echo ${{ github.event.pull_request.title }}
+        cat k8s/qa-enterprise-search-manifest/blue-deployment.yaml
+        sed -E -i'' "s/(.*qastage01-es-search:).*/\1${{ github.event.pull_request.title }}/" 'k8s/qa-enterprise-search-manifest/blue-deployment.yaml'
+        cat k8s/qa-enterprise-search-manifest/blue-deployment.yaml
+
+    - name: Apply Kubernetes manifest
+      run: kubectl apply -f k8s/qa-enterprise-search-manifest/blue-deployment.yaml
+
+    - name: Check Deployment Rollout Status
+      run: kubectl rollout status deployment/blue-fe-es-search-qastage01 -n fe-es-search-qastage01
+
+    - name: Successfully Deployed
+      run: echo "Successfully Deployed Application"

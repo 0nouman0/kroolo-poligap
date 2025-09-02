@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kroolo-es-config-ustage01
+  namespace: fe-es-search-ustage01
+data:
+  NODE_ENV: staging
+  PORT: "3310"
+  API_KEY: "fghj"
+  API_URL: google.com

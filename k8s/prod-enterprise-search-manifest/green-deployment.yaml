@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: green-fe-es-search-prod
+  namespace: fe-es-search-prod
+  labels:
+    app: kroolo-es-prod
+    version: green
+spec:
+  selector:
+    matchLabels:
+      app: kroolo-es-prod
+      version: green
+  replicas: 2
+  strategy:
+    # Adding the rolling update strategy
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: kroolo-es-prod
+        version: green
+    spec:
+      containers:
+      - name: green-container
+        image: 315855795699.dkr.ecr.us-east-2.amazonaws.com/prod-es-search:latest
+        imagePullPolicy: Always
+        # envFrom:
+        #     - configMapRef:
+        #         name: kroolo-corp-config
+        ports:
+        - containerPort: 3000
+        # resources:
+        #   limits:
+        #     memory: "100Mi"
+        #     cpu: "200m"

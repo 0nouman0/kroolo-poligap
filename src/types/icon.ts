@@ -1,0 +1,76 @@
+import type { ElementType } from "react";
+
+export type IconType =
+  | "mistral"
+  | "gemini"
+  | "aws"
+  | "azure"
+  | "anthropic"
+  | "tool-loader"
+  | "groq"
+  | "fireworks"
+  | "export-pdf"
+  | "loading-icon"
+  | "export-mark"
+  | "export-docx"
+  | "search"
+  | "deepseek"
+  | "export"
+  | "cohere"
+  | "ollama"
+  | "xai"
+  | "agno"
+  | "user"
+  | "agent"
+  | "open-ai"
+  | "sheet"
+  | "nextjs"
+  | "shadcn"
+  | "tailwind"
+  | "brain"
+  | "reasoning"
+  | "agno-tag"
+  | "refresh"
+  | "edit"
+  | "save"
+  | "x"
+  | "arrow-down"
+  | "send"
+  | "download"
+  | "hammer"
+  | "check"
+  | "chevron-down"
+  | "chevron-up"
+  | "plus-icon"
+  | "references"
+  | "trash"
+  | "image"
+  | "video"
+  | "kroolo"
+  | "audio"
+  | "anthropic_icon"
+  | "gpt_icon"
+  | "deepseek_icon"
+  | "meta_icon"
+  | "gemini_icon"
+  | "tool"
+  | "ppt_icon"
+  | "pdf_icon"
+  | "txt_icon"
+  | "video_icon"
+  | "audio_icon"
+  | "image_icon"
+  | "docx_icon"
+  | "csv_icon"
+  | "unknown_icon"
+  | "tasks";
+
+export interface IconProps {
+  type: IconType;
+  size?: "xs" | "sm" | "md" | "lg" | "dot" | "xxs" | "default";
+  className?: string;
+  color?: string;
+  disabled?: boolean;
+}
+
+export type IconTypeMap = Record<IconType, ElementType>;
